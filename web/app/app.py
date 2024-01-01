@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, send_from_directory
 import sqlite3
 import shutil
 import os
@@ -10,6 +10,11 @@ def get_db_connection():
     conn = sqlite3.connect('users.db')
     conn.row_factory = sqlite3.Row  # This enables name-based access to columns
     return conn
+
+@app.route('/images/<int:user_id>/<path:filename>')
+def serve_image(user_id, filename):
+    image_path = f"images/{user_id}/anchor/"
+    return send_from_directory(image_path, filename)
 
 @app.route('/')
 def index():
@@ -23,7 +28,6 @@ def index():
 
     conn.close()
     return render_template('dashboard.html', users=users)
-
 
 @app.route('/delete_user/<int:id>', methods=['POST'])
 def delete_user(id):
@@ -106,7 +110,10 @@ def capture_image(id):
     conn.close()
 
     if user:
-        return render_template('capture_image.html', user=user)
+        valid_path = f"images/{id}/anchor/"
+        image_files = [f for f in os.listdir(valid_path) if os.path.isfile(os.path.join(valid_path, f))]
+        first_image = image_files[0] if image_files else None
+        return render_template('capture_image.html', user=user, first_image=first_image)
     else:
         return "User not found", 404
 
