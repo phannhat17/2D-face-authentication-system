@@ -98,10 +98,27 @@
                 video.play();
             });
         }
+        function getSquareDimensions(videoWidth, videoHeight) {
+            // Determine the size of the square
+            var size = Math.min(videoWidth, videoHeight);
+
+            // Calculate the top left coordinates of the square
+            var x = (videoWidth - size) / 2;
+            var y = (videoHeight - size) / 2;
+
+            return { x: x, y: y, size: size };
+        }
+
 
         captureButton.addEventListener('click', function () {
-            context.drawImage(video, 0, 0, 410, 410);
+            // Get square dimensions based on the video's aspect ratio
+            var dimensions = getSquareDimensions(video.videoWidth, video.videoHeight);
+
+            // Draw the cropped square image onto the canvas
+            context.drawImage(video, dimensions.x, dimensions.y, dimensions.size, dimensions.size, 0, 0, canvas.width, canvas.height);
             capturedImage.src = canvas.toDataURL('image/png');
+
+            // Adjust the display settings
             capturedImage.style.display = 'block';
             video.style.display = 'none';
             captureButton.style.display = 'none';
