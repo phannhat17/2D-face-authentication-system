@@ -28,7 +28,27 @@
 
         }
 
-        #video,
+        .video-container {
+            width: 410px;
+            /* Set the size of the square */
+            height: 410px;
+            /* Same as width to make it square */
+            overflow: hidden;
+            /* Hide parts of the video outside this container */
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        #video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scaleX(-1);
+            min-width: 100%;
+            min-height: 100%;
+        }
+
         #capturedImage {
             transform: scaleX(-1);
             /* Flips the elements horizontally */
@@ -56,7 +76,9 @@
                         </div>
                         <div class="col">
                             <div class="image-wrapper">
-                                <video id="video" width="410" autoplay></video>
+                                <div class="video-container" id="video-container">
+                                    <video id="video" autoplay></video>
+                                </div>
                                 <canvas id="canvas" width="410" height="410" style="display:none;"></canvas>
                                 <img id="capturedImage" style="display:none;" width="410" />
                             </div>
@@ -81,6 +103,7 @@
 
     <script>
         var video = document.getElementById('video');
+        var video_con = document.getElementById('video-container');
         var canvas = document.getElementById('canvas');
         var context = canvas.getContext('2d');
         var capturedImage = document.getElementById('capturedImage');
@@ -121,6 +144,7 @@
             // Adjust the display settings
             capturedImage.style.display = 'block';
             video.style.display = 'none';
+            video_con.style.display = 'none';
             captureButton.style.display = 'none';
             verifyButton.style.display = 'inline';
             retakeButton.style.display = 'inline';
@@ -128,6 +152,7 @@
 
         retakeButton.addEventListener('click', function () {
             video.style.display = 'block';
+            video_con.style.display = 'block';
             captureButton.style.display = 'inline';
             capturedImage.style.display = 'none';
             verifyButton.style.display = 'none';
