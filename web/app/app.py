@@ -3,6 +3,7 @@ import sqlite3
 import shutil
 import os
 from verify import verify
+from face_extract import process_image
 
 app = Flask(__name__)
 
@@ -38,7 +39,7 @@ def delete_user(id):
     user = conn.execute('SELECT * FROM users WHERE id = ?', (id,)).fetchone()
     
     if user:
-        image_path = user['image_path']
+        image_path = image_path = f"images/{id}/"
         if os.path.exists(image_path):
             shutil.rmtree(image_path)
 
@@ -51,18 +52,15 @@ def delete_user(id):
 @app.route('/upload_image/<int:id>', methods=['POST'])
 def upload_image(id):
     if 'user_images' in request.files:
-        # Create directory if it doesn't exist
         image_path = f"images/{id}/anchor/"
         if not os.path.exists(image_path):
             os.makedirs(image_path)
 
-        # Loop through each file in the request
         for file in request.files.getlist('user_images'):
             if file.filename != '':
-                # Construct the full file path
                 file_path = os.path.join(image_path, file.filename)
-                # Save the file
-                file.save(file_path)
+                file.save(file_path)  # Save the uploaded file
+                process_image(file_path)  # Process and overwrite the file
 
     return redirect(url_for('index'))
 
@@ -127,10 +125,9 @@ def save_image():
         os.makedirs(f"images/{user_id}")
 
     photo.save(image_path)
-
+    process_image(image_path)
     valid_path = f"images/{user_id}/anchor/"
     verified = verify(valid_path, image_path, 0.5, 0.5)
-    print(verified)
     
     return {"status": "success", "image_path": image_path, "verified": verified}
 

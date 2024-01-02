@@ -60,5 +60,8 @@ def verify(valid_path, input_img_a, detection_threshold, verification_threshold)
     # Verification Threshold: Proportion of positive predictions / total positive samples 
     verification = detection / len(os.listdir(valid_path)) 
     verified = verification > verification_threshold
+
+    print(verified)
+    print(results)
     
     return str(verified)
