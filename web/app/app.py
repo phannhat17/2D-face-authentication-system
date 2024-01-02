@@ -52,17 +52,27 @@ def delete_user(id):
 @app.route('/upload_image/<int:id>', methods=['POST'])
 def upload_image(id):
     if 'user_images' in request.files:
-        image_path = f"images/{id}/anchor/"
-        if not os.path.exists(image_path):
-            os.makedirs(image_path)
+        # Create directories if they don't exist
+        upload_path = f"images/{id}/anchor/"
+        processed_path = f"images/{id}/processed/"
+        if not os.path.exists(upload_path):
+            os.makedirs(upload_path)
+        if not os.path.exists(processed_path):
+            os.makedirs(processed_path)
 
+        # Loop through each file in the request
         for file in request.files.getlist('user_images'):
             if file.filename != '':
-                file_path = os.path.join(image_path, file.filename)
-                file.save(file_path)  # Save the uploaded file
-                process_image(file_path)  # Process and overwrite the file
+                # Save the original file
+                file_path = os.path.join(upload_path, file.filename)
+                file.save(file_path)
+
+                # Process and save the file
+                processed_file_path = os.path.join(processed_path, file.filename)
+                process_image(file_path, processed_file_path)
 
     return redirect(url_for('index'))
+
 
 @app.route('/add_user', methods=['GET', 'POST'])
 def add_user():
@@ -125,8 +135,8 @@ def save_image():
         os.makedirs(f"images/{user_id}")
 
     photo.save(image_path)
-    process_image(image_path)
-    valid_path = f"images/{user_id}/anchor/"
+    process_image(image_path, image_path)
+    valid_path = f"images/{user_id}/processed/"
     verified = verify(valid_path, image_path, 0.5, 0.5)
     
     return {"status": "success", "image_path": image_path, "verified": verified}

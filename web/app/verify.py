@@ -38,7 +38,6 @@ def preprocess(file_path):
     return img
 
 def verify(valid_path, input_img_a, detection_threshold, verification_threshold):
-    # Build results array
     results = []
     for image in os.listdir(valid_path):
         input_img = preprocess(input_img_a)
